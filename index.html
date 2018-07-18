@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MyCrypto Portfolio">
+    <title>MyCrypto Portfolio</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/easy-autocomplete/1.3.5/easy-autocomplete.min.css">
+    <style>
+        @media print
+        {    
+            .no-print, .no-print * {
+                display: none !important;
+            }
+        }
+
+        .hidden {
+            opacity: 0;
+        }
+
+        body {
+            font-family: "Open Sans", sans-serif;
+            line-height: 1.25;
+        }
+        
+        h1 {
+            text-align: center;
+            font-family: Tahoma, Arial, sans-serif;
+            color: #06D85F;            
+        }
+                    
+        .icon-main{
+            cursor: pointer;
+            padding: 5px;
+        }
+        .bordered{
+            border: 1px solid #898989;
+        }
+
+        /*buttons*/
+        .button-success,
+        .button-error,
+        .button-warning,
+        .button-secondary {
+            color: white;
+            border-radius: 4px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .button-success {
+            background: rgb(28, 184, 65); /* this is a green */
+        }
+
+        .button-error {
+            background: rgb(202, 60, 60); /* this is a maroon */
+        }
+
+        .button-warning {
+            background: rgb(223, 117, 20); /* this is an orange */
+        }
+
+        .button-secondary {
+            background: rgb(66, 184, 221); /* this is a light blue */
+        }
+
+        .rowIcon {
+            float:left;
+            padding-top: 2px;
+            padding-bottom: 0px;
+            cursor: pointer;
+        }
+
+        #addCoinForm {
+            opacity: 1;
+            transition: opacity 2s ease-in;
+            -moz-transition: opacity 2s ease-in;
+            -webkit-transition: opacity 2s ease-in;
+        }
+
+        /* table */
+        table {
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            table-layout: fixed;            
+        }
+        
+        table caption {
+            font-size: 1.5em;
+            margin: .5em 0 .75em;
+        }
+        
+        table tr {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: .35em;
+        }
+        
+        table th,
+        table td {
+            padding: .625em;
+            text-align: right;
+        }
+        
+        table th {
+            font-size: .85em;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+        
+        @media screen and (max-width: 600px) {
+            table {
+                border: 0;
+            }
+            table caption {
+                font-size: 1.3em;
+            }
+            table thead {
+                border: none;
+                clip: rect(0 0 0 0);
+                height: 1px;
+                margin: -1px;
+                overflow: hidden;
+                padding: 0;
+                position: absolute;
+                width: 1px;
+            }
+            table tr {
+                border-bottom: 3px solid #ddd;
+                display: block;
+                margin-bottom: .625em;
+            }
+            table td {
+                border-bottom: 1px solid #ddd;
+                display: block;
+                font-size: .8em;
+                text-align: right;
+            }
+            table td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            table td:last-child {
+                border-bottom: 0;
+            }
+        }       
+
+    </style>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/easy-autocomplete/1.3.5/jquery.easy-autocomplete.min.js"></script>
+
+    </script>
+</head>
+
+<body>
+    <div style="max-width: 920px;" >
+        <h1 class="center">MyCrypto Portfolio</h1>
+        
+        <div class="pure-g no-print">
+            <div class="pure-u-1-24"></div>
+            <div class="pure-u-22-24" style="text-align: right;">
+                <i id="btnMainAdd" class="fa fa-2x fa-plus icon-main" aria-hidden="true" onclick="showAddCoin();"></i>
+                <i id="btnMainSave" class="fa fa-2x fa-save icon-main" aria-hidden="true" onclick="showSave();"></i>
+                <i class="fa fa-2x fa-print icon-main" aria-hidden="true" onclick="window.print();"></i>
+                <i class="fa fa-2x fa-refresh icon-main" aria-hidden="true" onclick="updateGUI();"></i>
+            </div>
+            <div class="pure-u-1-24"></div>
+        </div>
+        
+        <div id="addCoinForm"  class="pure-g hidden no-print" style="padding-bottom: 10px;">
+            <div class="pure-u-1-24"></div>
+            <div class="pure-u-6-24">
+                <input id="currencyList" />                
+            </div>
+            <div class="pure-u-6-24"> 
+                <div class="easy-autocomplete eac-description" style="width: 194px;">
+                    <input id="currencyAmount" type="number" step="0.00001" min="0"  class="easy-autocomplete input" placeholder="Enter amount here" onkeydown="if(event.key === 'Enter') addCoin();"/>
+                </div>
+            </div>
+            <div class="pure-u-10-24"> 
+                    <i class="fa fa-2x fa-check" aria-hidden="true" onclick="addCoin();" style="cursor: pointer;color:green;"></i>
+                    <i class="fa fa-2x fa-times" aria-hidden="true" onclick="hideForms();" style="cursor: pointer;color:red;"></i>
+            </div>
+            <div class="pure-u-1-24"></div>
+        </div>
+
+        <div id="saveForm"  class="pure-g hidden no-print" style="padding-bottom: 10px;">
+            <div class="pure-u-1-24"></div>
+            <div class="pure-u-22-24 bordered">
+                <!--
+                <p>You can save your portfolie (settings, selected coins and amount) either in your browser via cookie or as a link.</p>
+                <div style="text-align:center;">
+                    <button id="btnCreateCookie" class="button-success pure-button" onclick="storeCookie();">Save as cookie</button> 
+                    <button id="btnRemoveCookie" class="button-error pure-button" onclick="removeCookie();">Remove cookie</button>
+                </div>         
+            -->       
+                <p>Below is the link with all your settings, you can open it in any browser to restore your portfolio.</p>
+                <div>
+                    <div class="easy-autocomplete eac-description" style="width: 60%;display: inline-block;">
+                        <input id="portfolioURL" type="text" class="easy-autocomplete input" style="width: 90%;" readonly="readonly"/>
+                    </div> 
+                    <button class="button-success pure-button" onclick="settingsHelper.copySettingsURLToClipboard();" style="display: inline-block;">Copy URL to clipboard</button>
+                </div>
+                
+
+                <i class="fa fa-2x fa-times" aria-hidden="true" onclick="hideForms();" style="cursor: pointer;color:red;float:right;"></i>
+            </div>            
+            <div class="pure-u-1-24"></div>
+        </div>
+
+        <div class="pure-g">
+            <div class="pure-u-1-24">
+            </div>
+            <div class="pure-u-22-24">
+                <table id="CoinTable">
+                    <thead>
+                        <tr>
+                            <th id="jsWarning" scope="col" style="color:red;text-align:center;">Please activate JavaScript!</th>                            
+                        </tr>
+                    </thead>                  
+                </table>
+            </div>
+            <div class="pure-u-1-24">
+            </div>
+        </div>    
+
+        <div class="pure-g">
+            <div class="pure-u-1-24"></div>
+            <div class="pure-u-22-24" style="text-align: right;">
+                <p id="overallValue" style="margin-right:10px;"></p>            
+            </div>
+            <div class="pure-u-1-24"></div>
+        </div>
+    </div>    
+
+</body>
+
+<script>
+    var currentSettings = null;
+    var coins = false;
+    var coinSelector = false;
+
+    function Settings() {
+        this.currencies = {
+            
+        };        
+        this.nightmode = false;
+        this.autoRefresh = false;
+        this.fiat = "EUR";        
+    };
+
+    loadSettings = function(settingsString) {
+        
+        var ret = new Settings();
+        var storedSettings = false;//settingsHelper.getCookieSettings();
+        if(!storedSettings)
+            storedSettings = settingsHelper.getSettingsFromURL();
+        if(storedSettings)
+            Object.assign(ret,storedSettings);
+
+        return ret;
+    };        
+
+    var showAddCoin = function(){
+
+        var url = "https://min-api.cryptocompare.com/data/all/coinlist";
+        
+        if(!coins){
+            $.getJSON(url).fail(function(ex) {
+                alert( "error while retrieving coins: " + ex );
+            }).done( function(data) {                
+                    coins = [];
+                    Object.keys(data.Data).forEach(function(key) {
+                        var coin = data.Data[key];
+                        coins.push({
+                            "name" : coin.Symbol,
+                            "fullname" : coin.CoinName,
+                            "icon" : "https://www.cryptocompare.com" + coin.ImageURL
+                        });                
+                    });
+
+                    var options = {
+                        data: coins,
+
+                        getValue: "name",
+
+                        list: {                 
+                            match: {
+                                enabled: true
+                            },
+                            onChooseEvent: function() {
+                                $("#currencyAmount").prop('disabled', false);
+                                $("#currencyAmount").select();
+                            }	
+                        },
+                        placeholder: "Enter crypto currency",
+
+                        template: {
+                            type: "description",
+                            fields: {
+                                description: "fullname",
+                                icon : "icon"
+                            }
+                        }
+                    };
+
+                    showAdding();
+                    coinSelector = $("#currencyList").easyAutocomplete(options);    
+                    $("#currencyList").select();                    
+            });  
+            return;
+        }
+
+        showAdding();  
+    }
+
+    
+
+    function hideForms(){
+        $("#currencyAmount").val("");
+        $("#currencyList").val("");
+        $("#addCoinForm").addClass("hidden");
+        $("#saveForm").addClass("hidden");
+        $("#btnMainSave").removeClass("bordered");
+        $("#btnMainAdd").removeClass("bordered");          
+    }
+
+    function showAdding(){
+        hideForms();
+        $("#addCoinForm").removeClass("hidden");
+        $("#currencyAmount").val("");
+        $("#currencyAmount").prop('disabled', true);
+        $("#currencyList").val(""); 
+        $("#btnMainAdd").addClass("bordered");
+        $("#currencyList").select();
+    }
+
+    function showSave(){        
+        var visible = !$("#saveForm").hasClass("hidden");  
+        
+        hideForms();
+
+        if(visible)
+            return;
+        
+        $("#btnMainSave").addClass("bordered");
+        $("#saveForm").removeClass("hidden");  
+                
+        if(settingsHelper.getCookieSettings()){
+            $("#btnRemoveCookie").show();
+        }else{
+            $("#btnRemoveCookie").hide();
+        }
+
+        var settingsURL = settingsHelper.getURLFromSettings(currentSettings);
+        $("#portfolioURL").val(settingsURL);
+    }
+
+    
+    function addCoin(){
+      
+        var amount = parseFloat($("#currencyAmount").val());        
+        var coinName = $("#currencyList").val();
+
+        if(isNaN(amount)){
+            alert("Please enter a valid amount");
+            return;
+        }
+
+        currentSettings.currencies[coinName] = amount;        
+
+        hideForms();
+        updateGUI(currentSettings);
+    }
+
+    function removeCurrency(name){
+        delete currentSettings.currencies[name];
+        updateGUI(currentSettings);
+    }
+
+    var updateGUI = function(settings){
+
+        if(!settings)
+            settings = currentSettings;
+
+        if(Object.keys(settings.currencies).length == 0){
+            var template = $('#emptyTable_template').html();
+            Mustache.parse(template);   // optional, speeds up future uses
+            var rendered = Mustache.render(template);
+            $("#CoinTable").html(rendered);
+            $("#overallValue").html("");
+
+            return;
+        }
+
+        var url = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=";
+        for(currency in settings.currencies){            
+            url += currency + ",";
+        }
+        url = url.replace(/.$/,"&");
+        url += "tsyms=" + settings.fiat;
+
+        $.getJSON(url).fail(function(ex) {
+            alert( "error while retrieving coin prices: " + ex );
+        }).done( function(data) {
+            refresh(data, settings);
+        });        
+    };
+
+    var getFiatChar = function(fiatName){
+        var curChar = "$";
+        if(fiatName == "EUR")
+            curChar = "€";
+        return curChar;
+    }
+
+    var getCellContent = function(colName, settings, coinName, price, amount){
+        var curChar = getFiatChar(settings.fiat);
+
+        switch(colName){
+            case "coin":
+                return  '<i class="fa fa-times fa-lg rowIcon" aria-hidden="true" onclick="removeCurrency(\'' + coinName+ '\');"></i>' + coinName;
+            case "amount":
+                return amount.toFixed(4);
+            case "price":
+                return price.toFixed(2) + " " + curChar;                
+            case "value":
+                return (price * amount).toFixed(2) + " " + curChar;
+            default:
+                return "";
+        }
+    };
+
+    var refresh = function(data, settings) {
+        
+        var results = {
+            "columns" : [
+                "coin",
+                "price",
+                "amount",
+                "value"
+            ],
+            "rows" : []
+        };
+
+        var overallValue = 0;
+
+        for(coinData in data){            
+            var row = {
+                "values" : []
+            }
+
+            for(colIndex in results.columns){
+                var colName = results.columns[colIndex];
+                var coinAmount = settings.currencies[coinData];
+                var coinPrice = data[coinData][settings.fiat];
+
+                row.values.push(
+                    {
+                        "name" : colName,
+                        "value" : getCellContent(
+                            colName, 
+                            settings, 
+                            coinData, 
+                            coinPrice, 
+                            coinAmount)
+                    }
+                );
+
+                if(colName == "value")
+                    overallValue += coinPrice * coinAmount;
+                
+            }
+            results.rows.push(row);
+        }
+              
+        var template = $(results.rows.length == 0 ? '#emptyTable_template' : '#table_template').html();
+        Mustache.parse(template);   // optional, speeds up future uses
+        var rendered = Mustache.render(template, results);
+        $("#CoinTable").html(rendered);
+        
+        $("#overallValue").html("<b>" + overallValue.toFixed(2) + " " +  getFiatChar(settings.fiat) + "</b>");
+    };
+
+    
+    var settingsHelper = {        
+        getCookieSettings : function(){        
+            var encodedSettings = cookieHelper.getCookie("settings");
+            if(!encodedSettings)
+                return false;
+                        
+            return settingsHelper.getSettingsFromString(encodedSettings);
+        },
+        getSettingsFromString : function(encodedSettings){
+            var settings = false;
+            
+            try{
+                var decodedSettings = atob(encodedSettings);
+                settings = JSON.parse(decodedSettings);
+            }catch(err){                 
+                // ignore
+                //console.log("error while parsing settings: " + err);
+            }
+
+            return settings;
+        },
+        getStringFromSettings: function(settings){
+            var decodedSettings = JSON.stringify(settings);
+            var encodedSettings = btoa(decodedSettings);
+            return encodedSettings;
+        },
+        getSettingsFromURL : function(){            
+            queryString = location.search.substring(1);
+            var settingsString = queryString.replace("settings=","");
+            return settingsHelper.getSettingsFromString(settingsString);
+        },
+        getURLFromSettings : function(settings){
+            var baseURL = window.location.protocol + "//"+ window.location.hostname + window.location.pathname;
+            var ret = baseURL + "?settings=" + settingsHelper.getStringFromSettings(settings);
+            return ret;
+        },
+        copySettingsURLToClipboard : function(){          
+            var copyText = document.getElementById("portfolioURL");
+            copyText.select();
+            document.execCommand("copy");
+        }
+    };
+
+    var cookieHelper = {
+        setCookie : function(name,value,days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days*24*60*60*1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+        },
+        getCookie : function(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0;i < ca.length;i++) {
+                var c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        },
+        eraseCookie : function (name) {   
+            document.cookie = name+'=; Max-Age=-99999999;';  
+        }
+    };
+
+    function storeCookie(settings){        
+        if(!settings)
+            settings = currentSettings;
+
+        var encodedSettings = settingsHelper.getStringFromSettings(settings);
+        cookieHelper.setCookie("settings", encodedSettings, 365);
+
+        $("#btnRemoveCookie").show();
+    }
+
+    function removeCookie(){
+        cookieHelper.eraseCookie("settings");
+
+        $("#btnRemoveCookie").hide();
+    }
+
+    // setup
+    $(function() {
+        currentSettings = loadSettings();
+        updateGUI(currentSettings);
+    });
+</script>
+
+<script id="table_template" type="x-tmpl-mustache">
+    <table id="CoinTable">
+        <thead>
+            <tr>
+                {{#columns}}
+                    <th scope="col">{{.}}</th>
+                {{/columns}}
+            </tr>
+        </thead>
+
+        <tbody>
+            {{#rows}}
+            <tr>
+                {{#values}}
+                    <td data-label="{{name}}">{{{value}}}</td>   
+                {{/values}}
+            </tr>
+            {{/rows}}            
+        </tbody>
+    </table>
+</script>
+
+
+<script id="emptyTable_template" type="x-tmpl-mustache">
+    <table id="CoinTable">
+        <thead>
+            <tr>
+                <th id="jsWarning" scope="col" style="text-align:center;">Click on the + symbol to add a currency</th>                            
+            </tr>
+        </thead> 
+    </table>
+</script>
+
+</html>
